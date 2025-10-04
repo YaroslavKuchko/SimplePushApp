@@ -1,0 +1,63 @@
+name: Build and Release APK
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # триггер при создании тега вида v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Buildozer and dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.buildozer
+            ~/.local/share/python-for-android
+            ~/.cache/pip
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('**/requirements.txt','**/buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip build-essential git zip unzip openjdk-11-jdk wget
+          pip install --upgrade pip
+          pip install --user --upgrade buildozer
+
+      - name: Build APK
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          buildozer -v android debug
+          
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: simplepush-apk
+          path: bin/*.apk
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/*.apk
+          asset_name: simplepush.apk
+          asset_content_type: application/vnd.android.package-archive
