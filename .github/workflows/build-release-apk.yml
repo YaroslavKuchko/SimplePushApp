@@ -35,6 +35,11 @@ jobs:
       - name: Build APK
         run: |
           export PATH=$HOME/.local/bin:$PATH
+          ls -la
+          echo "Current directory contents:"
+          pwd
+          echo "Looking for buildozer.spec:"
+          find . -name "buildozer.spec" -type f
           buildozer -v android debug
           
       - name: Upload APK as workflow artifact
