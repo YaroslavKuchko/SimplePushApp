@@ -12,6 +12,9 @@ package.domain = org.example
 # (str) Source code main file
 source.main = main.py
 
+# (str) Source directory
+source.dir = .
+
 # (list) Source files to include (extensions)
 source.include_exts = py,png,jpg,kv,atlas,json
 
