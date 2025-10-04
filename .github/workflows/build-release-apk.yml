@@ -31,6 +31,19 @@ jobs:
           sudo apt-get install -y python3-pip build-essential git zip unzip openjdk-11-jdk wget
           pip install --upgrade pip
           pip install --user --upgrade buildozer cython
+          
+      - name: Accept Android SDK licenses
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          # Create directory for Android SDK
+          mkdir -p ~/.buildozer/android/platform
+          # Accept licenses by creating license files
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-arm-dbt-license
+          echo "d975f751698a77b662f1254ddbeed3901e976f5a" > ~/.buildozer/android/platform/android-sdk/licenses/android-googletv-license
+          echo "33b6a2b64607f11b759f320ef9dff4ae5c47d97a" > ~/.buildozer/android/platform/android-sdk/licenses/google-gdk-license
 
       - name: Build APK
         run: |
